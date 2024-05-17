@@ -1,0 +1,49 @@
+#!/bin/bash
+
+function print_devices 
+{
+	local is_source=0
+	com="$(pactl list)"
+	IFS=$'\n'
+	for line in $com; do
+		if [[ $line =~ Source\ \#[0-9]* ]]; then
+			is_source=1
+			echo $line
+		elif [[ $line =~ Name:\ [^\ ]* ]]  && [[ $is_source == 1 ]]; then
+			is_source=0
+			echo $line
+		fi
+	done
+}
+
+function start_listen
+{
+	if [ -z "$1" ]; then
+		echo "[!] What is source id"
+		echo "[!] listen start [source id]"
+		exit 1
+	fi
+
+	pactl load-module module-loopback --source $1
+}
+
+function stop_listen
+{
+	pactl unload-module module-loopback
+}
+
+case "$1" in
+	start) start_listen $2
+	;;
+	stop) stop_listen
+	;;
+	list) print_devices
+	;;
+	*) 
+		echo "[!] No action"
+		echo "[!] listen [action] <options>"
+	;;
+esac
+
+#pactl unload-module module-loopback
+#pactl load-module module-loopback --source 53
