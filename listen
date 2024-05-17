@@ -24,7 +24,7 @@ function start_listen
 		exit 1
 	fi
 
-	pactl load-module module-loopback --source $1
+	pactl load-module module-loopback source=$1
 }
 
 function stop_listen
